@@ -1,2 +1,3 @@
-# silverstripe-rest-api-basicauth-app
-Instead of authorizing member objects, this module provides an easy abstraction to allow the authorization of apps against an api by using BasicAuth.
+# silverstripe-rest-api-basicauth
+
+The module allows to authenticate users against the ntb/silverstripe-rest-api using the BasicAuth mechanism.

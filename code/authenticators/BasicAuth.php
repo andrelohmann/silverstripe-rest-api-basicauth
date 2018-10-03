@@ -5,7 +5,7 @@ use Ntb\RestAPI\ApiSession;
 use Ntb\RestAPI\AuthFactory;
 use Ntb\RestAPI\RestUserException;
 
-namespace Ntb\APIBasicAuthApp;
+namespace Ntb\APIBasicAuth;
 
 /**
  * Authentication mechanism using a BasicAuth request.
@@ -16,18 +16,18 @@ class BasicAuth extends \Object implements \Ntb\RestAPI\IAuth {
 
         public static function authenticate($key, $secret) {
             $authenticator = \Injector::inst()->get('ApiMemberAuthenticator');
-            if($app = $authenticator->authenticate(['AppKey' => $key, 'AppSecret' => $secret])) {
-                    return self::createSession($app);
+            if($member = $authenticator->authenticate(['Email' => $key, 'Password' => $secret])) {
+                    return self::createSession($member);
             }
         }
 
 	/**
-	 * @param \Ntb\APIBasicAuthApp\APIAccessApp $user
+	 * @param \Member $user
 	 * @return ApiSession
 	 */
-	public static function createSession($app) {
+	public static function createSession($user) {
 		$user->logIn();
-		/** @var Member $user */
+		/** @var \Member $user */
 		$user = \DataObject::get(Config::inst()->get('BaseRestController', 'Owner'))->byID($user->ID);
 
 		// create session
@@ -43,7 +43,7 @@ class BasicAuth extends \Object implements \Ntb\RestAPI\IAuth {
             if(!$owner) {
                 throw new \Ntb\RestAPI\RestUserException("No session found", 404, 404);
             }
-            //$owner->logOut();
+            $owner->logOut();
             return true;
         }
 
@@ -53,18 +53,18 @@ class BasicAuth extends \Object implements \Ntb\RestAPI\IAuth {
          * @return Member
          */
         public static function current($request) {
-            $app = self::getBasicAuthApp();
-            return ($app instanceof \Ntb\APIBasicAuthApp\APIAccessApp) ? \DataObject::get(\Config::inst()->get('BaseRestController', 'Owner'))->byID($app->ID) : null;
+            $member = self::getBasicAuth();
+            return ($member instanceof \Member) ? \DataObject::get(\Config::inst()->get('BaseRestController', 'Owner'))->byID($member->ID) : null;
         }
-        
+
         /**
          * @return Member
          */
-        protected static function getBasicAuthApp(){
-            
+        protected static function getBasicAuth(){
+
             //$isRunningTests = (class_exists('SapphireTest', false) && SapphireTest::is_running_test());
             //if(!Security::database_is_ready() || (Director::is_cli() && !$isRunningTests)) return true;
-            
+
             /*
              * Enable HTTP Basic authentication workaround for PHP running in CGI mode with Apache
              * Depending on server configuration the auth header may be in HTTP_AUTHORIZATION or
@@ -83,18 +83,18 @@ class BasicAuth extends \Object implements \Ntb\RestAPI\IAuth {
                     $_SERVER['PHP_AUTH_PW'] = strip_tags($password);
             }
 
-            $app = null;
+            $member = null;
             if(isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
                     $authenticator = \Injector::inst()->get('ApiMemberAuthenticator');
-                    if($app = $authenticator->authenticate([
-                        'AppKey' => $_SERVER['PHP_AUTH_USER'],
-                        'AppSecret' => $_SERVER['PHP_AUTH_PW']
+                    if($member = $authenticator->authenticate([
+                        'Email' => $_SERVER['PHP_AUTH_USER'],
+                        'Password' => $_SERVER['PHP_AUTH_PW']
                     ])){
-                        if($app->canLogIn()) return $app;
+                        if($member->canLogIn()) return $member;
                         return null;
                     }
             }
-            return $app;
+            return $member;
         }
 
 }

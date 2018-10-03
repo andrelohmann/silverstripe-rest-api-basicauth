@@ -1,5 +1,5 @@
 ---
-Name: rest_api_basicauth_app
+Name: rest_api_basicauth
 After:
   - 'framework/*'
   - 'cms/*'
@@ -7,21 +7,21 @@ After:
 ---
 Injector:
   Authenticator:
-    class: Ntb\APIBasicAuthApp\BasicAuth
+    class: Ntb\APIBasicAuth\BasicAuth
   ApiMemberAuthenticator:
-    class: Ntb\APIBasicAuthApp\Authenticator
+    class: Ntb\APIBasicAuth\Authenticator
   SessionValidator:
-    class: Ntb\APIBasicAuthApp\Validator
+    class: Ntb\RestAPI\SessionValidator
   PermissionChecks:
-    class: Ntb\APIBasicAuthApp\Permission
+    class: Ntb\RestAPI\SilverstripePermission
 BaseRestController:
   CORSOrigin: '*'
   CORSMethods: 'GET, PUT, POST, DELETE, OPTIONS'
   CORSMaxAge: '1000'
   CORSAllowHeaders: 'Content-Type, Authorization, X-Requested-With'
-  Owner: Ntb\APIBasicAuthApp\APIAccessApp
+  Owner: Member
 SessionValidator:
-  email_name: app-key
-  password_name: secret
+  email_name: email
+  password_name: password
 NestedResourceRestController:
   root_resource_id_field: ID

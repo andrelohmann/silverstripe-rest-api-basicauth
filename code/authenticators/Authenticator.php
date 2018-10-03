@@ -1,59 +1,57 @@
 <?php
 
-namespace Ntb\APIBasicAuthApp;
+namespace Ntb\APIBasicAuth;
 
 /**
- * Authenticator for the APIAccessApp
+ * Authenticator for the Member
  *
  * @author Andre Lohmann <lohmann.andre@gmail.com>
- * @package silverstripe-rest-api-basicauth-app
+ * @package silverstripe-rest-api-basicauth
  */
 class Authenticator extends \Object {
 
 	/**
-	 * Attempt to find and authenticate app if possible from the given data
+	 * Attempt to find and authenticate member if possible from the given data
 	 *
 	 * @param array $data
 	 * @param bool &$success Success flag
-	 * @return APIAccessApp Found app, regardless of successful authentication
+	 * @return \Member Found member, regardless of successful authentication
 	 */
-	protected static function authenticate_app($data, &$success) {
+	protected static function authenticate_member($data, &$success) {
 		// Default success to false
 		$success = false;
 
 		// Attempt to identify by temporary ID
-		$app = null;
+		$member = null;
 
-		$app = APIAccessApp::get()->filter("AppKey", $data['AppKey'])->first();
+		$member = \Member::get()->filter("Email", $data['Email'])->first();
 
-		// Validate against app if possible
-		if($app) {
-			$result = $app->checkSecret($data['AppSecret']);
+		// Validate against member if possible
+		if($member) {
+			$result = $member->checkPassword($data['Password']);
 			$success = $result->valid();
 		} else {
 			$result = new \ValidationResult(false, _t (
-				'APIAccessApp.ERRORWRONGCRED',
-				'The provided details don\'t seem to be correct. Please try again.'
+				'Member.ERRORWRONGCRED'
 			));
 		}
 
-		return $app;
+		return $member;
 	}
 
 	/**
-	 * Method to authenticate an app
+	 * Method to authenticate a member
 	 *
 	 * @param array $data Raw data to authenticate the app
-         * 
-	 * @return bool|APIAccessApp Returns FALSE if authentication fails, otherwise
-	 *                     the app object
-         * 
+         *
+	 * @return bool|\Member Returns FALSE if authentication fails, otherwise
+	 *                     the Member object
+         *
 	 */
 	public static function authenticate($data) {
-		// Find authenticated app
-		$app = static::authenticate_app($data, $success);
+		// Find authenticated member
+		$member = static::authenticate_member($data, $success);
 
-		return $success ? $app : null;
+		return $success ? $member : null;
 	}
 }
-
