@@ -1,5 +1,5 @@
 {
-  "name": "andrelohmann-silverstripe/rest-api-basicauth-app",
+  "name": "andrelohmann-silverstripe/rest-api-basicauth",
   "description": "Authorize users againt your REST api using BasicAuth",
   "type": "silverstripe-module",
   "homepage": "https://github.com/andrelohmann/silverstripe-rest-api-basicauth/releases",
